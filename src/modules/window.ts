@@ -64,9 +64,12 @@ export async function focus(): Promise<void> {
   const windows = BrowserWindow.getAllWindows()
 
   if (windows.length === 0) await createWindow()
-  else
-    return new Promise((res, rej) => {
-      windows[0].on("focus", res)
-      windows[0].focus()
-    })
+  else {
+    const win = windows[0]
+    if (win.isMinimized()) win.restore()
+    win.show()
+    win.focus()
+  } 
 }
+
+

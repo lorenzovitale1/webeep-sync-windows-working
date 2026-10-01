@@ -58,15 +58,20 @@ class Logger extends EventEmitter {
    * @param str the string to be appended to the log file
    */
   private async writeToFile(str: string) {
-    if (!this.ready) this.once("ready", () => this.writeToFile(str))
-    if (this.isWriting)
-      this.once("finished_writing", () => this.writeToFile(str))
-    else {
-      this.isWriting = true
-      await this.logFile.write(str + "\n")
-      this.isWriting = false
-      this.emit("finished_writing")
+    if (!this.ready) {
+      this.once("ready", () => this.writeToFile(str))
+      return
     }
+    if (this.isWriting) {
+      this.once("finished_writing", () => this.writeToFile(str))
+      return
+    }
+    this.isWriting = true
+    if (this.logFile) {
+      await this.logFile.write(str + "\n")
+    }
+    this.isWriting = false
+    this.emit("finished_writing")
   }
 
   error(message: unknown, _module?: string) {
@@ -120,3 +125,4 @@ export const createLogger = (
 ): ReturnType<typeof logger.createLogger> => {
   return logger.createLogger(moduleName)
 }
+
