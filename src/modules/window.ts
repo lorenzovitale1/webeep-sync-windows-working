@@ -25,8 +25,7 @@ export async function createWindow(): Promise<void> {
       height: 600,
       width: 800,
       autoHideMenuBar: true,
-      titleBarStyle: "hidden",
-      trafficLightPosition: { x: 9, y: 9 },
+      frame: false,
       minHeight: 460,
       minWidth: 600,
       webPreferences: {
@@ -34,15 +33,21 @@ export async function createWindow(): Promise<void> {
         contextIsolation: false,
       },
       icon: iconImg,
-      show: false,
+      show: true,
     })
-    mainWindow.on("ready-to-show", () => {
+
+    mainWindow.webContents.on("did-fail-load", (e, code, desc) => {
+      debug("did-fail-load: " + code + " " + desc)
+    })
+
+    mainWindow.once("ready-to-show", () => {
       mainWindow.show()
       resolve()
     })
 
     // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+    resolve()
   })
 }
 
@@ -69,7 +74,5 @@ export async function focus(): Promise<void> {
     if (win.isMinimized()) win.restore()
     win.show()
     win.focus()
-  } 
+  }
 }
-
-

@@ -271,9 +271,13 @@ async function checkForUpdates() {
     process.platform !== "linux" &&
     store.data.settings.automaticUpdates
   ) {
-    const { debug } = createLogger("UPDATE")
+    const { debug, error } = createLogger("UPDATE")
     debug("checking for updates")
-    autoUpdater.checkForUpdates()
+    try {
+      autoUpdater.checkForUpdates()
+    } catch (e: any) {
+      error("Could not check for updates: " + (e?.message || e))
+    }
   }
 }
 
@@ -610,5 +614,6 @@ ipcMain.handle("mark-notification-read", async (e, id: number) => {
 ipcMain.handle("mark-all-notifications-read", async () => {
   await moodleClient.markAllNotificationsAsRead()
 })
+
 
 
