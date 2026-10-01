@@ -38,6 +38,17 @@ if (!app.requestSingleInstanceLock()) {
   app.exit()
 }
 
+// Disable hardware acceleration to prevent GPU sandbox crash on Windows (exit_code=-1073741790)
+app.disableHardwareAcceleration()
+
+process.on("uncaughtException", (err: any) => {
+  error("Uncaught exception: " + (err?.stack || err))
+})
+
+process.on("unhandledRejection", (reason: any) => {
+  error("Unhandled rejection: " + reason)
+})
+
 // power save blocker id, to prevent suspension mid sync
 let psbID: number
 downloadManager.on("sync", () => {
@@ -599,3 +610,5 @@ ipcMain.handle("mark-notification-read", async (e, id: number) => {
 ipcMain.handle("mark-all-notifications-read", async () => {
   await moodleClient.markAllNotificationsAsRead()
 })
+
+
